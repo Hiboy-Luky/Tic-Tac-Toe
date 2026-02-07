@@ -1,8 +1,9 @@
-import { Paper, Center } from "@mantine/core";
+import { Paper } from "@mantine/core";
 import React from "react";
+import type {CellValueType} from "../../types";
 
 interface BoardTileProps {
-    value: "x" | "o" | "";
+    value: CellValueType;
     onClick: () => void;
 }
 
@@ -12,21 +13,22 @@ const BoardTile: React.FC<BoardTileProps> = ({ value, onClick }) => {
             withBorder
             shadow="sm"
             style={{
-                width: "100%",         // fill grid cell
-                aspectRatio: "1 / 1",  // make it square
+                width: "100%",
+                aspectRatio: "1 / 1",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
                 cursor: "pointer",
-                outline: "1px solid red", // debug
+                outline: "1px solid red",
+                fontSize: "clamp(24px, 3vw, 64px)",
+                userSelect: "none",
             }}
             onClick={onClick}
         >
-            <Center style={{ fontSize: "3vw", minFontSize: 24 }}>
-                {value === "x" && "X"}
-                {value === "o" && "O"}
-            </Center>
+            {value?.toUpperCase()}
         </Paper>
+
+
     );
 };
 

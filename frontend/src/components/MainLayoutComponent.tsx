@@ -1,12 +1,14 @@
 import React, {type ReactNode } from 'react';
-import {AppShell, Container, Flex} from '@mantine/core';
+import {AppShell} from '@mantine/core';
+import type {MantineSpacing} from "@mantine/core";
+
 
 interface MainLayoutProps {
     children: ReactNode;
     header?: ReactNode;
     navbar?: ReactNode;
     footer?: ReactNode;
-    padding?: string | number;
+    padding?: MantineSpacing;
 }
 
 const MainLayoutComponent: React.FC<MainLayoutProps> = ({
@@ -27,18 +29,8 @@ const MainLayoutComponent: React.FC<MainLayoutProps> = ({
             {navbar && <AppShell.Navbar>{navbar}</AppShell.Navbar>}
 
             <AppShell.Main>
-                <Flex
-                    direction="column"
-                    align="center"
-                    justify="center"
-                    style={{ height: "100vh" }} // full viewport height
-                >
-                    <Container size="lg">
-                        {children}
-                    </Container>
-                </Flex>
+                    {children}
             </AppShell.Main>
-
 
             {footer && <AppShell.Footer>{footer}</AppShell.Footer>}
 
