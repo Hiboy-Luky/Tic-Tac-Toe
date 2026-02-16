@@ -1,11 +1,5 @@
 import type {BoardType, Move, PlayerType} from "../types";
 
-export const initialBoard: BoardType = [
-    ["", "", ""],
-    ["", "", ""],
-    ["", "", ""],
-];
-
 export const makeMove = (board: BoardType, move: Move): BoardType => {
     const { row, col, player } = move;
     if (board[row][col]) return board;

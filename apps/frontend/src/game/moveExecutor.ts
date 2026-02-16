@@ -13,7 +13,7 @@ export class LocalExecutor implements MoveExecutor {
 
 export class ServerExecutor implements MoveExecutor {
     async executeMove(board: BoardType, command: MoveCommand): Promise<BoardType> {
-        const response = await fetch("todo/move", {
+        const response = await fetch("/move", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ row: command.row, col: command.col, player: command.player, board }),

@@ -1,41 +1,62 @@
-import React, {useMemo, useState} from "react";
+import React, {useMemo, useReducer, useEffect, useState} from "react";
 import GameBoard from "../components/GameBoard/GameBoard.tsx";
-import type {BoardType, PlayerType} from "../types";
-import {LocalExecutor} from "../game/moveExecutor.ts";
+import {LocalExecutor, ServerExecutor} from "../game/moveExecutor.ts";
+import {gameReducer, initialBoard} from "../game/gameReducer.ts";
 import {MoveCommand} from "../game/MoveCommand.ts";
-import {checkWinner, initialBoard} from "../game/gameLogic.ts";
-
-type GameState = {
-    board: BoardType,
-    currentPlayer: PlayerType,
-}
+import {Switch, Group, Stack} from "@mantine/core";
 
 const GamePage: React.FC = () => {
-    const [game, setGame] = useState<GameState>({
+    const [game, dispatch] = useReducer(gameReducer, {
         board: initialBoard,
-        currentPlayer: "x"
+        currentPlayer: "x",
+        winner: null
     });
 
-    const executor = useMemo(() => new LocalExecutor(), []);
+    const [isSinglePlayer, setIsSinglePlayer] = useState(false);
+    const executor = useMemo(() => {
+        return isSinglePlayer ? new ServerExecutor() : new LocalExecutor();
+    }, [isSinglePlayer]);
+
+    useEffect(() => {
+        if (game.winner) {
+            alert(`${game.winner.toUpperCase()} wins!`);
+        }
+    }, [game.winner])
+
     const handleTileClick = async (row: number, col: number) => {
-        const command = new MoveCommand(row , col, game.currentPlayer);
+        if (game.winner) return;
+
+        const command = new MoveCommand(row, col, game.currentPlayer);
+
         const newBoard = await executor.executeMove(game.board, command);
 
-        const winner = checkWinner(newBoard, {row: row, col: col, player: game.currentPlayer});
-
-        setGame(prev => ({
-            board: newBoard,
-            currentPlayer: winner ? prev.currentPlayer : prev.currentPlayer === "x" ? "o" : "x"
-        }));
-
-        if (winner) {
-            // TODO win logic
-            alert(`${winner.toUpperCase()} wins!`);
-            return;
-        }
+        dispatch({
+            type: "MOVE_RESOLVED",
+            payload: {
+                board: newBoard,
+                command
+            }
+        });
     };
 
-    return <GameBoard board={game.board} onTileClick={handleTileClick} />;
+    const handleModeToggle = (checked: boolean) => {
+        setIsSinglePlayer(checked);
+        dispatch({ type: "RESET" });
+    };
+
+    return <>
+        <Stack>
+            <Group>
+                <Switch
+                    label={isSinglePlayer ? "1P (Bot)" : "2P"}
+                    checked={isSinglePlayer}
+                    onChange={(event) => handleModeToggle(event.currentTarget.checked)}
+                />
+            </Group>
+
+            <GameBoard board={game.board} onTileClick={handleTileClick} />
+        </Stack>
+    </>
 };
 
 export default GamePage;
